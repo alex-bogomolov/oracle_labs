@@ -6,4 +6,3 @@ CREATE OR REPLACE VIEW investments_in_current_year AS
     INNER JOIN investors ON investors.id = investment_data.investor_id
     WHERE EXTRACT(YEAR FROM investment_data.investment_date) = EXTRACT(YEAR FROM SYSDATE)
     ORDER BY investment_data.investment_date;
-COMMIT;

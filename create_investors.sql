@@ -7,5 +7,3 @@ CREATE TABLE investors
         city VARCHAR(20) NOT NULL,
         CONSTRAINT investor_pk PRIMARY KEY(id)
     );
-
-COMMIT;

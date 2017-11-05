@@ -6,4 +6,3 @@ CREATE OR REPLACE VIEW investment_summary AS
     GROUP BY investments.id, investments.name
     ORDER BY "invest_amount" DESC;
     
-COMMIT;

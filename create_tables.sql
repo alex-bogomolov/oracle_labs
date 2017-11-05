@@ -1,5 +1,6 @@
 @create_investors.sql
 @populate_investors.sql
+@holders.sql
 @investor_city_view.sql
 @create_investments.sql
 @populate_investments.sql
@@ -7,6 +8,5 @@
 @populate_investment_data.sql
 @investment_summary.sql
 @investments_in_this_year.sql
-@align.sql
-@update_worth.sql
-@holders.sql
+@package.sql
+@package_body.sql

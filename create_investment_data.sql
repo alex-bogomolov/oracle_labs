@@ -13,4 +13,3 @@ CREATE TABLE investment_data
             FOREIGN KEY (investment_id)
             REFERENCES investments(id)
     );
-COMMIT;
