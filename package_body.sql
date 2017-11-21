@@ -124,7 +124,7 @@ BEGIN
 END RECALCULATE_WORTH;
 
 PROCEDURE DECREASE_INVEST_AMOUNT
-    (entered_investment_id NUMBER, difference NUMBER)
+    (entered_investment_id NUMBER, difference NUMBER, dividor NUMBER)
 AS
     CURSOR rows IS SELECT investment_data.id, invest_amount, investments.min_invest_amount FROM investment_data INNER JOIN investments ON investments.id = investment_data.investment_id WHERE investment_data.investment_id = entered_investment_id;
     negative_difference EXCEPTION;
@@ -132,6 +132,7 @@ AS
     difference_not_round EXCEPTION;
     too_small_difference EXCEPTION;
     new_invest_amount NUMBER;
+    result NUMBER;
 BEGIN
     IF difference < 0 THEN
         RAISE negative_difference;
@@ -143,14 +144,30 @@ BEGIN
         RAISE difference_not_round;
     END IF;
 
+    BEGIN
+        result := 1 / dividor;
+    EXCEPTION
+        WHEN ZERO_DIVIDE THEN
+        DBMS_OUTPUT.PUT_LINE('Dividor is 0');
+        result := 1 / 2;
+    END;
+
+    DBMS_OUTPUT.PUT_LINE('Result: ' || result);
+
     FOR row IN rows
     LOOP
-        new_invest_amount := row.invest_amount - difference;
-        IF new_invest_amount < row.min_invest_amount THEN
-            RAISE too_small_invest_amount;
-        END IF;
+        BEGIN
+            new_invest_amount := row.invest_amount - difference;
+            IF new_invest_amount < row.min_invest_amount THEN
+                RAISE too_small_invest_amount;
+            END IF;
 
-        UPDATE investment_data SET invest_amount = new_invest_amount WHERE id = row.id;
+            UPDATE investment_data SET invest_amount = new_invest_amount WHERE id = row.id;
+        EXCEPTION
+            WHEN too_small_invest_amount THEN
+            UPDATE investment_data SET invest_amount = row.min_invest_amount WHERE id = row.id;
+            DBMS_OUTPUT.PUT_LINE('setting invest amount of investment data with id ' || row.id || ' to min value ' || row.min_invest_amount);
+        END;
     END LOOP;
 
     recalculate_worth;
@@ -161,8 +178,6 @@ WHEN difference_not_round THEN
 raise_application_error(-20002, 'difference must be a round number');
 WHEN too_small_difference THEN
 raise_application_error(-20003, 'difference must be greater than 1000');
-WHEN too_small_invest_amount THEN
-raise_application_error(-20004, 'difference is too big: one of invest amounts is less than minimum invest amount');
 END;
 
 END IRS;
